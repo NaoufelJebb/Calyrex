@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+    ollama:
+        image: calyrex-ollama:v1
+        container_name: calyrex-ollama
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: Dockerfile.ollama
+            args:
+                OLLAMA_SERVE_PORT: ${OLLAMA_SERVE_PORT}
+                OLLAMA_CODE_LLM: ${OLLAMA_CODE_LLM}
+                OLLAMA_CHAT_LLM: ${OLLAMA_CHAT_LLM}
+                OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL}
+
+        expose:
+            - ${OLLAMA_SERVE_PORT}
+        volumes:
+            - ollama:/root/.ollama
+
+    chatUI:
+        image: calyrex-chat-ui:v1
+        container_name: calyrex-chat-ui
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: Dockerfile.chatUI
+            args:
+                CHAT_APP_EXPOSE_PORT: ${CHAT_APP_EXPOSE_PORT}
+        environment:
+            CHAT_APP_HOST: ${CHAT_APP_HOST}
+            CHAT_APP_EXPOSE_PORT: ${CHAT_APP_EXPOSE_PORT}
+
+        ports:
+            - "${CHAT_APP_PUBLISH_PORT}:${CHAT_APP_EXPOSE_PORT}"
+        depends_on:
+            - ollama
+        links:
+            - ollama
+
+volumes:
+    ollama:
+        driver: local

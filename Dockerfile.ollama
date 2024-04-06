@@ -1,0 +1,15 @@
+FROM ollama/ollama:latest
+
+ARG OLLAMA_SERVE_PORT
+ARG OLLAMA_CODE_LLM
+ARG OLLAMA_CHAT_LLM
+ARG OLLAMA_EMBEDDING_MODEL
+
+RUN nohup sh -c "/bin/ollama serve &"  \
+  && sleep 3                           \
+  && /bin/ollama pull $OLLAMA_CODE_LLM \
+  && /bin/ollama pull $OLLAMA_CHAT_LLM \
+  && /bin/ollama pull $OLLAMA_EMBEDDING_MODEL
+
+ENV OLLAMA_HOST ollama:$OLLAMA_SERVE_PORT
+EXPOSE $OLLAMA_SERVE_PORT

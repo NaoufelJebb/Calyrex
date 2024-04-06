@@ -1,0 +1,14 @@
+ARG PYTHON_VERSION="3.9"
+FROM python:$PYTHON_VERSION-alpine
+
+ARG CHAT_APP_HOST
+ARG CHAT_APP_EXPOSE_PORT
+
+WORKDIR /calyrex
+COPY ./requirements.txt ./chainlit.md ./.env ./app ./
+
+RUN pip install --no-cache-dir -r ./requirements.txt
+
+EXPOSE $CHAT_APP_EXPOSE_PORT
+
+ENTRYPOINT chainlit run ./chat.py --port $CHAT_APP_EXPOSE_PORT
